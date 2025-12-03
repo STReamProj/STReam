@@ -2,12 +2,45 @@
 <head>
     <title>Sample Page</title>
     <style>
+        body{
+            background-color: #ffffff;
+        }
+        a{
+            text-decoration: none;
+        }
+        #header-area{
+            background-color: aqua;
+        }
+#header-content-wrapper{
+    display: flex;
+}
+        #top-menu{
+            margin-left: auto;
+            margin-top:auto;
+            margin-bottom: auto;
+        }
+        #top-menu-table {
+            
+            border-collapse: collapse; 
+            border-spacing: 0;
+}
+        .top-menu-content-link{
+            padding-left: 1cap;
+            padding-right: 1cap;
+            height: auto;
+            background-color: black;            
+        }
+        .top-menu-content-link a{
+            color: #ffffff;
+        }
+
+
 
     </style>
 </head>
 <body>
     <div id="header-area">
-        <header>
+        <div id="header-content-wrapper">
             <div id="site-name">
                 <a href="#">
                     <h1 id="site-title">
@@ -17,13 +50,46 @@
             </div>
             <div id="top-menu">
                 <table id="top-menu-table">
-                    <tr><a href="#">PAGE1</a></tr>
-                    <tr><a href="#">PAGE2</a></tr>
-                    <tr><a href="#">PAGE3</a></tr>
+                    <td class="top-menu-content-link"><a href="#">PAGE1</a></td>
+                    <td class="top-menu-content-link"><a href="#">PAGE2</a></td>
+                    <td class="top-menu-content-link"><a href="#">PAGE3</a></td>
+                    <td class="top-menu-content-link"><a href="#">PAGE4</a></td>
+
                 </table>
             </div>
             
-        </header>
+        </div>
     </div>
+    <div id="contet">
+                <h1>content</h1>
+            </div>
+            <div id="footer">
+                <footer>
+                    <div id="footer-links">
+                        <table>
+                            <tr>
+                                <th>List A</th>
+                                <th>List B</th>
+                            </tr>
+                            <tr>
+                                <td><a href="#">Link</a></td>
+                                <td><a href="#">Link</a></td>
+                            </tr>
+                                                        <tr>
+                                <td><a href="#">Link</a></td>
+                                <td><a href="#">Link</a></td>
+                            </tr>
+                                                        <tr>
+                                <td><a href="#">Link</a></td>
+                                <td><a href="#">Link</a></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div id="footer-logo">
+                        <h3><a href="#">STReam</a></h3>
+                        <small id="copyright">Copyright 2025 STReam, Cemlo All rights reserved.</small>
+                    </div>
+                </footer>
+            </div>
 </body>
 </html>
