@@ -1,42 +1,7 @@
 <html>
 <head>
     <title>Sample Page</title>
-    <style>
-        body{
-            background-color: #ffffff;
-        }
-        a{
-            text-decoration: none;
-        }
-        #header-area{
-            background-color: aqua;
-        }
-#header-content-wrapper{
-    display: flex;
-}
-        #top-menu{
-            margin-left: auto;
-            margin-top:auto;
-            margin-bottom: auto;
-        }
-        #top-menu-table {
-            
-            border-collapse: collapse; 
-            border-spacing: 0;
-}
-        .top-menu-content-link{
-            padding-left: 1cap;
-            padding-right: 1cap;
-            height: auto;
-            background-color: black;            
-        }
-        .top-menu-content-link a{
-            color: #ffffff;
-        }
-
-
-
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="header-area">
@@ -49,47 +14,65 @@
                 </a>
             </div>
             <div id="top-menu">
-                <table id="top-menu-table">
-                    <td class="top-menu-content-link"><a href="#">PAGE1</a></td>
-                    <td class="top-menu-content-link"><a href="#">PAGE2</a></td>
-                    <td class="top-menu-content-link"><a href="#">PAGE3</a></td>
-                    <td class="top-menu-content-link"><a href="#">PAGE4</a></td>
-
-                </table>
+                <nav id="top-menu-table">
+                    <!-- Needed to add ul&il -->
+                    <a href="#">PAGE1</a>
+                    <a href="#">PAGE1</a>
+                    <a href="#">PAGE1</a>
+                    <a href="#">PAGE1</a>
+                    
+                </nav>
             </div>
             
         </div>
     </div>
-    <div id="contet">
-                <h1>content</h1>
+    <div id="content">
+                <h1>Content Title</h1>
+                <h2>sect. title</h2>
+                <h3>sect. title h3</h3>
+                <p>本文</p>
+                <div class="accordion">
+                    <details class="section-ac">
+                        <summary>accordion</summary>
+                        <p>おわあああああああああああああああああああああ</p>
+                    </details>
+                </div>
+                <a href="#">Normal Link</a><br>
+                <a href="#" class="btn">Button Link</a>
+                <div class="card"></div>
+                <div class="tabs"></div>                          
+                <section></section>
             </div>
             <div id="footer">
-                <footer>
                     <div id="footer-links">
-                        <table>
+                        <table id="footer-links-contents">
                             <tr>
                                 <th>List A</th>
                                 <th>List B</th>
+                                <th>List C</th>
                             </tr>
                             <tr>
                                 <td><a href="#">Link</a></td>
                                 <td><a href="#">Link</a></td>
+                                <td><a href="#">Link</a></td>
                             </tr>
                                                         <tr>
                                 <td><a href="#">Link</a></td>
                                 <td><a href="#">Link</a></td>
+                                <td><a href="#">Link</a></td>
                             </tr>
                                                         <tr>
+                                <td><a href="#">Link</a></td>
                                 <td><a href="#">Link</a></td>
                                 <td><a href="#">Link</a></td>
                             </tr>
                         </table>
                     </div>
+                    <hr>
                     <div id="footer-logo">
                         <h3><a href="#">STReam</a></h3>
                         <small id="copyright">Copyright 2025 STReam, Cemlo All rights reserved.</small>
                     </div>
-                </footer>
             </div>
 </body>
 </html>
