@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub API Live Experiment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .github-card {
+            background: linear-gradient(135deg, #24292e 0%, #1a1e22 100%);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-8 font-sans">
+
+    <div class="max-w-xl mx-auto space-y-8">
+        <header class="text-center">
+            <h1 class="text-3xl font-black text-white mb-2">Live API Fetch</h1>
+            <p class="text-slate-400">Placeholder.js で GitHub の生データを取得するよ！</p>
+        </header>
+
+        <!-- GitHub Repo Card (Fetch from Real API) -->
+        <div class="github-card border border-slate-700 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+            <!-- GitHub Icon (SVG) -->
+            <div class="absolute top-4 right-4 opacity-20">
+                <svg height="40" viewBox="0 0 16 16" version="1.1" width="40" fill="white"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Repository Full Name -->
+                <div>
+                    <span class="text-xs font-bold text-blue-400 uppercase tracking-widest">Repository</span>
+                    <h2 class="text-2xl font-mono font-bold text-white mt-1"
+                        data-source="json" 
+                        data-file="https://api.github.com/repos/google/gson" 
+                        data-key="full_name">
+                        Loading...
+                    </h2>
+                </div>
+
+                <!-- Description -->
+                <p class="text-slate-300 text-sm leading-relaxed"
+                   data-source="json" 
+                   data-file="https://api.github.com/repos/google/gson" 
+                   data-key="description">
+                    Fetching repository description from GitHub API...
+                </p>
+
+                <!-- Stats -->
+                <div class="flex gap-6 pt-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-yellow-500">★</span>
+                        <span class="font-mono text-sm"
+                              data-source="json" 
+                              data-file="https://api.github.com/repos/google/gson" 
+                              data-key="stargazers_count">0</span>
+                        <span class="text-slate-500 text-xs text-xs">Stars</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-blue-400">⌥</span>
+                        <span class="font-mono text-sm"
+                              data-source="json" 
+                              data-file="https://api.github.com/repos/google/gson" 
+                              data-key="forks_count">0</span>
+                        <span class="text-slate-500 text-xs">Forks</span>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="pt-4">
+                    <a href="#" class="inline-flex items-center gap-2 bg-white text-slate-900 px-5 py-2.5 rounded-full font-bold text-sm hover:bg-slate-200 transition-colors"
+                       data-source="json" 
+                       data-file="https://api.github.com/repos/google/gson" 
+                       data-key="html_url" 
+                       data-attr="href">
+                        View on GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Local JSON Check (Combined Test) -->
+        <div class="p-4 bg-slate-800/50 border border-slate-700 rounded-xl text-xs text-slate-400">
+            <p>Local File Status: 
+                <span class="text-emerald-400" data-source="json" data-file="./files/data.json" data-key="external_test.status_msg">
+                    Checking local data...
+                </span>
+            </p>
+        </div>
+    </div>
+
+    <!-- 既存のロジックを読み込む -->
+    <script src="Placeholder.js"></script>
+</body>
+</html>
