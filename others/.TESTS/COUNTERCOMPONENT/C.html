@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Match Scoreboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* スムーズなレスポンシブ変化のための微調整 */
+        .text-responsive-header {
+            font-size: clamp(1.25rem, 4vw, 3rem);
+        }
+        .text-responsive-score {
+            font-size: clamp(2.5rem, 8vw, 6rem);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 flex items-center justify-center p-2 sm:p-4 md:p-8">
+
+    <!-- コンテナの最大幅を設定しつつ、全画面で中央寄せ -->
+    <div id="app" class="w-full max-w-6xl mx-auto">
+        <!-- Team Match Card -->
+        <div class="bg-white rounded-sm shadow-xl overflow-hidden border-t-4 border-indigo-600">
+            
+            <!-- Team Header: Overall Score -->
+            <div class="p-4 sm:p-8 md:p-12 bg-gray-50 border-b flex flex-col sm:flex-row justify-between items-center gap-6 sm:gap-2">
+                <!-- Team A -->
+                <div class="flex-1 text-center w-full min-w-0">
+                    <h2 class="text-[10px] sm:text-xs font-black text-gray-400 uppercase tracking-widest mb-1">TEAM A</h2>
+                    <p class="text-responsive-header font-black text-indigo-600 truncate px-2">TOKYO<br> ACADEMY</p>
+                </div>
+                
+                <!-- Center Score -->
+                <div class="flex items-center gap-4 sm:gap-6 md:gap-10 shrink-0">
+                    <span class="text-responsive-score font-black italic text-indigo-600 leading-none">2</span>
+                    <div class="flex flex-col items-center min-w-[50px] sm:min-w-[80px]">
+                        <span class="text-[8px] sm:text-[10px] md:text-xs font-bold text-gray-300 tracking-widest leading-none uppercase">Matches</span>
+                        <div class="h-[1px] md:h-[2px] w-full bg-gray-200 my-1 sm:my-2"></div>
+                        <span class="text-[8px] sm:text-[10px] md:text-xs font-bold text-gray-300 tracking-widest leading-none uppercase">Won</span>
+                    </div>
+                    <span class="text-responsive-score font-black italic text-gray-400 leading-none">1</span>
+                </div>
+
+                <!-- Team B -->
+                <div class="flex-1 text-center w-full min-w-0">
+                    <h2 class="text-[10px] sm:text-xs font-black text-gray-400 uppercase tracking-widest mb-1">TEAM B</h2>
+                    <p class="text-responsive-header font-black text-gray-400 truncate px-2">OSAKA CLUB</p>
+                </div>
+            </div>
+
+            <!-- Individual Matches List -->
+            <div class="p-2 sm:p-4 md:p-6 space-y-2 sm:space-y-4">
+                
+                <!-- Match 1 -->
+                <div class="p-3 sm:p-5 bg-white border rounded-sm flex items-center justify-between gap-2 sm:gap-4 md:gap-8">
+                    <!-- Players Left -->
+                    <div class="flex-1 flex flex-col min-w-0">
+                        <span class="text-[10px] sm:text-xs md:text-base font-black text-indigo-600 uppercase truncate leading-tight">Sato</span>
+                        <span class="text-[10px] sm:text-xs md:text-base font-black text-indigo-600 uppercase truncate leading-tight">Tanaka</span>
+                    </div>
+                    
+                    <!-- Match Result Center -->
+                    <div class="flex-[1.5] sm:flex-[2] flex flex-col items-center shrink-0">
+                        <span class="text-[8px] sm:text-[10px] font-bold text-gray-400 mb-1 sm:mb-2 tracking-widest whitespace-nowrap">MATCH 1</span>
+                        <div class="flex items-center gap-2 sm:gap-4 md:gap-6">
+                            <span class="text-xl sm:text-3xl md:text-4xl font-black italic text-indigo-600">4</span>
+                            <div class="flex gap-0.5 sm:gap-1">
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-red-500"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-red-500"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-red-500"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-red-500"></div>
+                            </div>
+                            <span class="text-[8px] sm:text-xs font-bold text-gray-300 mx-0.5 sm:mx-1">VS</span>
+                            <div class="flex gap-0.5 sm:gap-1">
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-gray-300"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-gray-100"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-gray-100"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-gray-100"></div>
+                            </div>
+                            <span class="text-xl sm:text-3xl md:text-4xl font-black italic text-gray-400">1</span>
+                        </div>
+                    </div>
+
+                    <!-- Players Right -->
+                    <div class="flex-1 text-right flex flex-col min-w-0">
+                        <span class="text-[10px] sm:text-xs md:text-base font-black text-indigo-600 uppercase truncate leading-tight">Suzuki</span>
+                        <span class="text-[10px] sm:text-xs md:text-base font-black text-indigo-600 uppercase truncate leading-tight">Ito</span>
+                    </div>
+                </div>
+
+                <!-- Match 2 -->
+                <div class="p-3 sm:p-5 bg-white border rounded-sm flex items-center justify-between gap-2 sm:gap-4 md:gap-8">
+                    <div class="flex-1 flex flex-col min-w-0">
+                        <span class="text-[10px] sm:text-xs md:text-base font-black text-indigo-600 uppercase truncate leading-tight">Takahashi</span>
+                        <span class="text-[10px] sm:text-xs md:text-base font-black text-indigo-600 uppercase truncate leading-tight">Watanabe</span>
+                    </div>
+                    
+                    <div class="flex-[1.5] sm:flex-[2] flex flex-col items-center shrink-0">
+                        <span class="text-[8px] sm:text-[10px] font-bold text-gray-400 mb-1 sm:mb-2 tracking-widest whitespace-nowrap">MATCH 2</span>
+                        <div class="flex items-center gap-2 sm:gap-4 md:gap-6">
+                            <span class="text-xl sm:text-3xl md:text-4xl font-black italic text-gray-400">0</span>
+                            <div class="flex gap-0.5 sm:gap-1">
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-gray-100"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-gray-100"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-gray-100"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-gray-100"></div>
+                            </div>
+                            <span class="text-[8px] sm:text-xs font-bold text-gray-300 mx-0.5 sm:mx-1">VS</span>
+                            <div class="flex gap-0.5 sm:gap-1">
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-red-500"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-red-500"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-red-500"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-red-500"></div>
+                            </div>
+                            <span class="text-xl sm:text-3xl md:text-4xl font-black italic text-indigo-600">4</span>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 text-right flex flex-col min-w-0">
+                        <span class="text-[10px] sm:text-xs md:text-base font-black text-indigo-600 uppercase truncate leading-tight">Yamamoto</span>
+                        <span class="text-[10px] sm:text-xs md:text-base font-black text-indigo-600 uppercase truncate leading-tight">Nakamura</span>
+                    </div>
+                </div>
+
+                <!-- Match 3 (Deciding Match) -->
+                <div class="p-3 sm:p-5 bg-indigo-50 border border-indigo-200 rounded-sm flex items-center justify-between gap-2 sm:gap-4 md:gap-8 relative overflow-hidden">
+                    <div class="flex-1 flex flex-col min-w-0">
+                        <span class="text-[10px] sm:text-xs md:text-base font-black text-indigo-600 uppercase truncate leading-tight">Kobayashi</span>
+                        <span class="text-[10px] sm:text-xs md:text-base font-black text-indigo-600 uppercase truncate leading-tight">Kato</span>
+                    </div>
+                    
+                    <div class="flex-[1.5] sm:flex-[2] flex flex-col items-center shrink-0">
+                        <span class="text-[8px] sm:text-[10px] font-bold text-indigo-600 mb-1 sm:mb-2 tracking-widest whitespace-nowrap uppercase">Deciding Match</span>
+                        <div class="flex items-center gap-2 sm:gap-4 md:gap-6">
+                            <span class="text-xl sm:text-3xl md:text-4xl font-black italic text-indigo-600">4</span>
+                            <div class="flex gap-0.5 sm:gap-1">
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-red-500"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-red-500"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-red-500"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-red-500"></div>
+                            </div>
+                            <span class="text-[8px] sm:text-xs font-bold text-indigo-300 mx-0.5 sm:mx-1">VS</span>
+                            <div class="flex gap-0.5 sm:gap-1">
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-gray-300"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-gray-100"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-gray-100"></div>
+                                <div class="w-1.5 h-3 sm:w-2 sm:h-5 md:w-3 md:h-7 skew-x-[-20deg] bg-gray-100"></div>
+                            </div>
+                            <span class="text-xl sm:text-3xl md:text-4xl font-black italic text-gray-400">1</span>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 text-right flex flex-col min-w-0">
+                        <span class="text-[10px] sm:text-xs md:text-base font-black text-indigo-600 uppercase truncate leading-tight">Yoshida</span>
+                        <span class="text-[10px] sm:text-xs md:text-base font-black text-indigo-600 uppercase truncate leading-tight">Yamada</span>
+                    </div>
+                    <!-- Small victory indicator -->
+                    <div class="absolute right-0 top-0 h-full w-1 md:w-2 bg-indigo-600"></div>
+                </div>
+
+            </div>
+
+            <!-- Winner Banner -->
+            <div class="bg-indigo-600 p-4 sm:p-6 text-center">
+                <span class="text-xs sm:text-sm md:text-base font-black text-white tracking-[0.3em] sm:tracking-[0.6em] uppercase">TOKYO ACADEMY WINS THE MATCH</span>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

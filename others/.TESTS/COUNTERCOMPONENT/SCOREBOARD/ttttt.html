@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bounce Curling</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            touch-action: none;
+            overflow: hidden;
+            background-color: #f0f4f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background: #fff;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            cursor: crosshair;
+        }
+        .hidden-screen {
+            display: none !important;
+            opacity: 0;
+        }
+        #level-selector::-webkit-scrollbar {
+            width: 4px;
+        }
+        #level-selector::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <!-- Top Menu -->
+    <div id="top-menu" class="absolute inset-0 bg-slate-50 z-50 flex flex-col items-center justify-center p-6 text-center">
+        <h1 class="text-5xl font-black text-slate-800 mb-4 tracking-tighter italic">Bounce Curling</h1>
+        
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6 max-w-sm">
+            <h2 class="text-lg font-bold text-slate-700 mb-2">遊び方</h2>
+            <p class="text-slate-500 text-sm leading-relaxed text-left">
+                ・1ステージ **3つのストーン** を投げられます。<br>
+                ・ストーン同士はぶつかって弾き合います。<br>
+                ・3つ投げ終わった後の合計点数でクリア判定！
+            </p>
+        </div>
+
+        <div class="flex flex-col gap-4 w-full max-w-[280px]">
+            <button id="start-game-btn" class="bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold py-4 px-8 rounded-full shadow-lg transition-transform active:scale-95">
+                TUTORIAL (Lv.1-30)
+            </button>
+            <button id="random-mode-btn" class="bg-purple-600 hover:bg-purple-700 text-white text-xl font-bold py-4 px-8 rounded-full shadow-lg transition-transform active:scale-95">
+                RANDOM MODE
+            </button>
+            
+            <div class="mt-2">
+                <p class="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-widest">Select Tutorial Level</p>
+                <div id="level-selector" class="flex flex-wrap justify-center gap-2 max-h-[160px] overflow-y-auto p-2 border border-slate-100 rounded-xl bg-slate-100/50"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Container -->
+    <div id="game-container" class="relative hidden-screen">
+        <div class="mb-4 flex justify-between items-end w-full max-w-[400px]">
+            <div>
+                <h1 id="mode-title" class="text-2xl font-bold text-slate-800">Normal Mode</h1>
+                <p id="level-display" class="text-sm font-medium text-slate-500">Level: 1</p>
+            </div>
+            <div class="flex flex-col items-end">
+                <button id="back-to-menu-btn" class="text-[10px] bg-slate-200 hover:bg-slate-300 px-2 py-1 rounded mb-1 text-slate-600">MENU</button>
+                <div class="text-right">
+                    <p id="score-display" class="text-sm font-bold text-blue-600">Points: 0</p>
+                    <p id="stones-left-display" class="text-xs text-slate-400 font-bold">Stones Left: 3</p>
+                </div>
+            </div>
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- UI Overlay -->
+        <div id="msg-overlay" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-lg text-center p-6">
+            <h2 id="msg-title" class="text-3xl font-black mb-2 text-slate-800">EXCELLENT!</h2>
+            <p id="msg-body" class="text-lg text-slate-600 mb-6"></p>
+            <div class="flex flex-col gap-3 w-full max-w-[200px]">
+                <button id="next-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full transition-transform active:scale-95 hidden">
+                    NEXT LEVEL
+                </button>
+                <button id="goto-random-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full transition-transform active:scale-95 hidden">
+                    PLAY RANDOM MODE
+                </button>
+                <button id="hint-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full transition-transform active:scale-95 hidden">
+                    SHOW HINT 💡
+                </button>
+                <button id="retry-btn" class="bg-slate-500 hover:bg-slate-600 text-white font-bold py-3 px-8 rounded-full transition-transform active:scale-95">
+                    RETRY
+                </button>
+                <button id="menu-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-600 font-bold py-2 px-8 rounded-full text-sm">
+                    TOP MENU
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+/**
+ * Bounce Curling - 3 Stones Edition
+ */
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const msgOverlay = document.getElementById('msg-overlay');
+const topMenu = document.getElementById('top-menu');
+const gameContainer = document.getElementById('game-container');
+const msgTitle = document.getElementById('msg-title');
+const msgBody = document.getElementById('msg-body');
+const nextBtn = document.getElementById('next-btn');
+const gotoRandomBtn = document.getElementById('goto-random-btn');
+const hintBtn = document.getElementById('hint-btn');
+const retryBtn = document.getElementById('retry-btn');
+const menuBtn = document.getElementById('menu-btn');
+const backToMenuBtn = document.getElementById('back-to-menu-btn');
+const startGameBtn = document.getElementById('start-game-btn');
+const randomModeBtn = document.getElementById('random-mode-btn');
+const levelSelector = document.getElementById('level-selector');
+const modeTitle = document.getElementById('mode-title');
+const levelDisplay = document.getElementById('level-display');
+const scoreDisplay = document.getElementById('score-display');
+const stonesLeftDisplay = document.getElementById('stones-left-display');
+
+// Constants
+const MAX_TUTORIAL_LEVEL = 30;
+const STONE_RADIUS = 15;
+const MAX_DRAG = 150;
+const SPEED_MULTIPLIER = 0.2; 
+const BOMB_RADIUS = 20;
+const EXPLOSION_FORCE = 18;
+const RANDOM_MODE_OBSTACLE_COUNT = 20;
+const BOUNCE_DAMPING = 0.8;
+const MAX_STONES_PER_LEVEL = 3;
+
+// Game State
+let gameState = {
+    level: 1,
+    maxReachedLevel: 1, 
+    score: 0,
+    totalShots: 0,
+    stonesLaunched: 0,
+    isDragging: false,
+    dragStart: { x: 0, y: 0 },
+    dragCurrent: { x: 0, y: 0 },
+    stones: [], 
+    obstacles: [],
+    bombs: [],
+    house: { x: 0, y: 0, r1: 60, r2: 40, r3: 20 },
+    friction: 0.985,
+    inGame: false,
+    isRandomMode: false,
+    bestTrajectory: [], 
+    showHint: false,
+    waitingForStop: false
+};
+
+function initCanvas() {
+    canvas.width = Math.min(window.innerWidth - 40, 400);
+    canvas.height = Math.min(window.innerHeight - 250, 600);
+}
+
+class Stone {
+    constructor(x, y) {
+        this.x = x; this.y = y; this.vx = 0; this.vy = 0; this.radius = STONE_RADIUS;
+        this.mass = 1;
+        this.active = true;
+    }
+
+    // 物理演算ロジックを共通化
+    update(obstacles, bombs, allStones, simBombState = null) {
+        const speed = Math.hypot(this.vx, this.vy);
+        if (speed < 0.1) {
+            this.vx = 0; this.vy = 0;
+            return false;
+        }
+
+        const stepSize = 3;
+        const steps = Math.ceil(speed / stepSize);
+        const svx = this.vx / steps;
+        const svy = this.vy / steps;
+
+        for (let s = 0; s < steps; s++) {
+            this.x += svx;
+            this.y += svy;
+
+            // Wall Collision
+            if (this.x - this.radius < 0) {
+                this.x = this.radius; this.vx = Math.abs(this.vx) * BOUNCE_DAMPING; 
+            } else if (this.x + this.radius > canvas.width) {
+                this.x = canvas.width - this.radius; this.vx = -Math.abs(this.vx) * BOUNCE_DAMPING;
+            }
+            if (this.y - this.radius < 0) {
+                this.y = this.radius; this.vy = Math.abs(this.vy) * BOUNCE_DAMPING;
+            } else if (this.y + this.radius > canvas.height) {
+                this.y = canvas.height - this.radius; this.vy = -Math.abs(this.vy) * BOUNCE_DAMPING;
+            }
+
+            // Object Collisions
+            for (let o of obstacles) this.checkObstacleCollision(o);
+            for (let other of allStones) {
+                if (other === this) continue;
+                this.checkStoneCollision(other);
+            }
+            for (let i = 0; i < bombs.length; i++) this.checkBombCollision(bombs[i], i, simBombState);
+        }
+        
+        this.vx *= gameState.friction;
+        this.vy *= gameState.friction;
+        return true;
+    }
+
+    checkStoneCollision(other) {
+        const dx = other.x - this.x;
+        const dy = other.y - this.y;
+        const dist = Math.hypot(dx, dy);
+        const minDist = this.radius + other.radius;
+
+        if (dist < minDist) {
+            const angle = Math.atan2(dy, dx);
+            const overlap = minDist - dist;
+            
+            const nx = dx / dist;
+            const ny = dy / dist;
+            const moveX = nx * overlap * 0.5;
+            const moveY = ny * overlap * 0.5;
+            this.x -= moveX; this.y -= moveY;
+            other.x += moveX; other.y += moveY;
+
+            const p = 2 * (this.vx * nx + this.vy * ny - other.vx * nx - other.vy * ny) / 2;
+            this.vx = (this.vx - p * nx) * BOUNCE_DAMPING;
+            this.vy = (this.vy - p * ny) * BOUNCE_DAMPING;
+            other.vx = (other.vx + p * nx) * BOUNCE_DAMPING;
+            other.vy = (other.vy + p * ny) * BOUNCE_DAMPING;
+        }
+    }
+
+    checkObstacleCollision(o) {
+        let closestX = Math.max(o.x, Math.min(this.x, o.x + o.w));
+        let closestY = Math.max(o.y, Math.min(this.y, o.y + o.h));
+        let dx = this.x - closestX;
+        let dy = this.y - closestY;
+        let distSq = dx * dx + dy * dy;
+
+        if (distSq < (this.radius * this.radius)) {
+            const dist = Math.sqrt(distSq) || 0.1;
+            const overlap = this.radius - dist;
+            const nx = dx / dist;
+            const ny = dy / dist;
+            this.x += nx * overlap;
+            this.y += ny * overlap;
+            if (Math.abs(dx) > Math.abs(dy)) this.vx *= -BOUNCE_DAMPING;
+            else this.vy *= -BOUNCE_DAMPING;
+        }
+    }
+
+    checkBombCollision(b, index, simBombState) {
+        const isActive = simBombState ? simBombState[index] : b.active;
+        if (!isActive) return;
+        const dist = Math.hypot(this.x - b.x, this.y - b.y);
+        if (dist < (this.radius + b.radius)) {
+            const angle = Math.atan2(this.y - b.y, this.x - b.x);
+            this.vx = Math.cos(angle) * EXPLOSION_FORCE;
+            this.vy = Math.sin(angle) * EXPLOSION_FORCE;
+            if (simBombState) simBombState[index] = false; else b.active = false;
+        }
+    }
+
+    draw(isCurrent = false) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(this.x + 2, this.y + 3, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,0,0,0.1)';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = isCurrent ? '#3b82f6' : '#475569';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius * 0.6, 0, Math.PI * 2);
+        ctx.strokeStyle = isCurrent ? '#1e3a8a' : '#1e293b';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.restore();
+    }
+}
+
+class Obstacle {
+    constructor(x, y, w, h) { this.x = x; this.y = y; this.w = w; this.h = h; }
+    draw() {
+        ctx.save();
+        ctx.fillStyle = '#cbd5e1'; ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.roundRect(this.x, this.y, this.w, this.h, 4);
+        ctx.fill(); ctx.stroke();
+        ctx.restore();
+    }
+}
+
+class Bomb {
+    constructor(x, y) { this.x = x; this.y = y; this.radius = BOMB_RADIUS; this.active = true; }
+    draw() {
+        if (!this.active) return;
+        ctx.save();
+        const gradient = ctx.createRadialGradient(this.x, this.y, 5, this.x, this.y, this.radius);
+        gradient.addColorStop(0, '#f87171'); gradient.addColorStop(1, '#b91c1c');
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = gradient; ctx.fill();
+        ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.restore();
+    }
+}
+
+function updateLevelSelector() {
+    levelSelector.innerHTML = '';
+    for (let i = 1; i <= MAX_TUTORIAL_LEVEL; i++) {
+        const btn = document.createElement('button');
+        btn.innerText = i;
+        const isLocked = i > gameState.maxReachedLevel;
+        btn.className = `w-10 h-10 rounded-lg font-bold text-sm transition-all ${
+            isLocked ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-white text-blue-600 shadow-sm hover:bg-blue-50 active:scale-90'
+        }`;
+        if (!isLocked) btn.onclick = () => { gameState.isRandomMode = false; gameState.level = i; setupLevel(i, false); startGame(); };
+        levelSelector.appendChild(btn);
+    }
+}
+
+function startGame() {
+    gameState.inGame = true;
+    topMenu.classList.add('hidden-screen');
+    gameContainer.classList.remove('hidden-screen');
+    modeTitle.innerText = gameState.isRandomMode ? "Random Mode" : "Tutorial Mode";
+}
+
+function setupLevel(level, isRetry = false) {
+    gameState.stones = [];
+    gameState.stonesLaunched = 0;
+    gameState.waitingForStop = false;
+    gameState.isDragging = false;
+    
+    createNewStone();
+
+    gameState.house = { x: canvas.width / 2, y: 120, r1: 60, r2: 40, r3: 20 };
+
+    if (!isRetry) {
+        gameState.showHint = false;
+        gameState.obstacles = [];
+        gameState.bombs = [];
+        gameState.bestTrajectory = [];
+        if (gameState.isRandomMode) generateRandomLevel();
+        else generateNormalLevel(level);
+    } else {
+        gameState.bombs.forEach(b => b.active = true);
+        // リトライ時もベスト軌道を再計算
+        calculateBestTrajectory();
+    }
+
+    levelDisplay.innerText = gameState.isRandomMode ? `Session: ${gameState.totalShots + 1}` : `Level: ${level}`;
+    stonesLeftDisplay.innerText = `Stones Left: ${MAX_STONES_PER_LEVEL}`;
+    msgOverlay.classList.add('hidden');
+    nextBtn.classList.add('hidden');
+    gotoRandomBtn.classList.add('hidden');
+    hintBtn.classList.add('hidden');
+}
+
+function createNewStone() {
+    if (gameState.stonesLaunched < MAX_STONES_PER_LEVEL) {
+        const s = new Stone(canvas.width / 2, canvas.height - 50);
+        gameState.stones.push(s);
+    }
+}
+
+// 衝突判定付きの安全な配置チェック
+function isSafePosition(x, y, w, h, isBomb = false) {
+    const padding = 15;
+    const checkRadius = isBomb ? BOMB_RADIUS + padding : Math.max(w, h) + padding;
+
+    // ハウスとの距離
+    if (Math.hypot(x + (w||0)/2 - gameState.house.x, y + (h||0)/2 - gameState.house.y) < gameState.house.r1 + padding + 20) return false;
+    
+    // 他の障害物との重なり
+    for (let o of gameState.obstacles) {
+        if (x < o.x + o.w + padding && x + w + padding > o.x && y < o.y + o.h + padding && y + h + padding > o.y) return false;
+    }
+    
+    // 他の爆弾との重なり
+    for (let b of gameState.bombs) {
+        if (Math.hypot(x + (w||0)/2 - b.x, y + (h||0)/2 - b.y) < (isBomb ? BOMB_RADIUS * 2 : BOMB_RADIUS + 30) + padding) return false;
+    }
+
+    return true;
+}
+
+function generateNormalLevel(level) {
+    let seed = level * 133.7;
+    const count = Math.min(Math.floor(level / 2), 8);
+    
+    for(let i=0; i<count; i++) {
+        let attempts = 0;
+        while(attempts < 50) {
+            let w = 40 + (Math.abs(Math.sin(seed++)) * 60), h = 15;
+            let x = Math.abs(Math.sin(seed++)) * (canvas.width - w);
+            let y = 180 + Math.abs(Math.sin(seed++)) * (canvas.height - 350);
+            if (isSafePosition(x, y, w, h)) {
+                gameState.obstacles.push(new Obstacle(x, y, w, h));
+                break;
+            }
+            attempts++;
+        }
+    }
+    
+    if (level >= 10) {
+        const bombCount = Math.floor(level/10);
+        for(let i=0; i<bombCount; i++) {
+            let attempts = 0;
+            while(attempts < 50) {
+                let x = 50 + Math.random()*(canvas.width-100);
+                let y = 200 + Math.random()*(canvas.height-350);
+                if (isSafePosition(x, y, 0, 0, true)) {
+                    gameState.bombs.push(new Bomb(x, y));
+                    break;
+                }
+                attempts++;
+            }
+        }
+    }
+    calculateBestTrajectory();
+}
+
+function generateRandomLevel() {
+    // 障害物を配置
+    for (let i = 0; i < RANDOM_MODE_OBSTACLE_COUNT; i++) {
+        let attempts = 0;
+        while(attempts < 30) {
+            const x = Math.random() * (canvas.width - 60) + 30;
+            const y = 180 + Math.random() * (canvas.height - 300);
+            if (isSafePosition(x - 20, y - 7, 40, 14)) {
+                gameState.obstacles.push(new Obstacle(x - 20, y - 7, 40, 14));
+                break;
+            }
+            attempts++;
+        }
+    }
+    // 爆弾を配置
+    const bombCount = 3 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < bombCount; i++) {
+        let attempts = 0;
+        while(attempts < 30) {
+            const x = Math.random() * (canvas.width - 60) + 30;
+            const y = 180 + Math.random() * (canvas.height - 300);
+            if (isSafePosition(x, y, 0, 0, true)) {
+                gameState.bombs.push(new Bomb(x, y));
+                break;
+            }
+            attempts++;
+        }
+    }
+    calculateBestTrajectory();
+}
+
+// ハウス中心を射抜くベスト軌道を計算する
+function calculateBestTrajectory() {
+    let bestDist = Infinity;
+    gameState.bestTrajectory = [];
+
+    // ステップを細かくして全探索（角度と強さを総当たり）
+    for (let deg = -40; deg <= 40; deg += 1) {
+        for (let powerRatio = 0.4; powerRatio <= 1.0; powerRatio += 0.05) {
+            let simStone = new Stone(canvas.width / 2, canvas.height - 50);
+            let rad = (deg - 90) * Math.PI / 180;
+            let power = MAX_DRAG * powerRatio;
+            simStone.vx = Math.cos(rad) * power * SPEED_MULTIPLIER;
+            simStone.vy = Math.sin(rad) * power * SPEED_MULTIPLIER;
+
+            let path = [];
+            let limit = 1500;
+            let simBombState = gameState.bombs.map(b => b.active);
+
+            while (limit-- > 0) {
+                path.push({ x: simStone.x, y: simStone.y });
+                if (!simStone.update(gameState.obstacles, gameState.bombs, [], simBombState)) break;
+            }
+
+            let d = Math.hypot(simStone.x - (canvas.width / 2), simStone.y - 120);
+            if (d < bestDist) {
+                bestDist = d;
+                gameState.bestTrajectory = path;
+            }
+        }
+    }
+}
+
+function drawHouse() {
+    ctx.save();
+    const { x, y, r1, r2, r3 } = gameState.house;
+    ctx.beginPath(); ctx.arc(x, y, r1, 0, Math.PI * 2);
+    ctx.fillStyle = '#e2e8f0'; ctx.fill(); ctx.strokeStyle = '#cbd5e1'; ctx.stroke();
+    ctx.beginPath(); ctx.arc(x, y, r2, 0, Math.PI * 2);
+    ctx.fillStyle = '#93c5fd'; ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, r3, 0, Math.PI * 2);
+    ctx.fillStyle = '#f87171'; ctx.fill();
+    ctx.restore();
+}
+
+function drawHint() {
+    if (!gameState.showHint || !gameState.bestTrajectory.length) return;
+    ctx.save();
+    ctx.beginPath(); 
+    ctx.setLineDash([10, 5]); 
+    ctx.strokeStyle = 'rgba(34, 197, 94, 0.7)'; 
+    ctx.lineWidth = 4;
+    for (let i = 0; i < gameState.bestTrajectory.length; i += 5) {
+        const p = gameState.bestTrajectory[i];
+        if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+    }
+    ctx.stroke(); 
+    
+    const lastPos = gameState.bestTrajectory[gameState.bestTrajectory.length - 1];
+    ctx.beginPath();
+    ctx.arc(lastPos.x, lastPos.y, 10, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(34, 197, 94, 0.3)';
+    ctx.fill();
+    
+    ctx.restore();
+}
+
+function calculateFinalScore() {
+    let total = 0;
+    gameState.stones.forEach(stone => {
+        const dist = Math.hypot(stone.x - gameState.house.x, stone.y - gameState.house.y);
+        if (dist < gameState.house.r3) total += 100;
+        else if (dist < gameState.house.r2) total += 50;
+        else if (dist < gameState.house.r1) total += 20;
+    });
+    return total;
+}
+
+function showResult() {
+    const points = calculateFinalScore();
+    gameState.score += points;
+    scoreDisplay.innerText = `Points: ${gameState.score}`;
+    gameState.showHint = false;
+    if (points > 0) {
+        msgTitle.innerText = points >= 150 ? "AMAZING!" : "CLEAR!";
+        msgBody.innerText = `合計 ${points} ポイント獲得！`;
+        if (gameState.isRandomMode) nextBtn.innerText = "NEXT STAGE"; 
+        else {
+            if (gameState.level < MAX_TUTORIAL_LEVEL) {
+                nextBtn.innerText = "NEXT LEVEL"; if (gameState.level === gameState.maxReachedLevel) gameState.maxReachedLevel++;
+            } else { msgTitle.innerText = "CONGRATULATIONS!"; msgBody.innerText = "全30ステージクリア！"; gotoRandomBtn.classList.remove('hidden'); }
+        }
+        nextBtn.classList.remove('hidden');
+    } else {
+        msgTitle.innerText = "MISS..."; msgBody.innerText = "ポイントを獲得できなかった！";
+        nextBtn.classList.add('hidden');
+        if (gameState.isRandomMode) hintBtn.classList.remove('hidden');
+    }
+    msgOverlay.classList.remove('hidden');
+}
+
+function update() {
+    if (!gameState.inGame) { requestAnimationFrame(update); return; }
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    drawHouse(); 
+    drawHint();
+    gameState.bombs.forEach(b => b.draw());
+    gameState.obstacles.forEach(o => o.draw());
+
+    let anyMoving = false;
+    gameState.stones.forEach((s, idx) => {
+        const isAiming = (idx === gameState.stones.length - 1 && !gameState.waitingForStop && s.vx === 0);
+        if (!isAiming) {
+            if (s.update(gameState.obstacles, gameState.bombs, gameState.stones)) anyMoving = true;
+        }
+        s.draw(isAiming);
+    });
+
+    if (gameState.waitingForStop && !anyMoving) {
+        gameState.waitingForStop = false;
+        showResult();
+    }
+
+    if (gameState.isDragging) {
+        const currentStone = gameState.stones[gameState.stones.length - 1];
+        const dx = gameState.dragStart.x - gameState.dragCurrent.x;
+        const dy = gameState.dragStart.y - gameState.dragCurrent.y;
+        const dist = Math.min(Math.hypot(dx, dy), MAX_DRAG);
+        const angle = Math.atan2(dy, dx);
+        
+        ctx.save();
+        ctx.beginPath(); 
+        ctx.moveTo(currentStone.x, currentStone.y);
+        ctx.lineTo(currentStone.x + Math.cos(angle) * dist, currentStone.y + Math.sin(angle) * dist);
+        ctx.strokeStyle = 'rgba(59,130,246,0.6)'; 
+        ctx.setLineDash([5, 5]); 
+        ctx.lineWidth = 3; 
+        ctx.stroke();
+        ctx.restore();
+    }
+    requestAnimationFrame(update);
+}
+
+function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX, clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: clientX - rect.left, y: clientY - rect.top };
+}
+
+canvas.addEventListener('mousedown', (e) => {
+    if (gameState.waitingForStop || !msgOverlay.classList.contains('hidden')) return;
+    const pos = getPos(e);
+    const currentStone = gameState.stones[gameState.stones.length - 1];
+    if (currentStone && currentStone.vx === 0 && Math.hypot(pos.x - currentStone.x, pos.y - currentStone.y) < currentStone.radius * 3.5) {
+        gameState.isDragging = true; gameState.dragStart = pos; gameState.dragCurrent = pos;
+    }
+});
+window.addEventListener('mousemove', (e) => { if (gameState.isDragging) gameState.dragCurrent = getPos(e); });
+window.addEventListener('mouseup', () => {
+    if (gameState.isDragging) {
+        const currentStone = gameState.stones[gameState.stones.length - 1];
+        const dx = gameState.dragStart.x - gameState.dragCurrent.x;
+        const dy = gameState.dragStart.y - gameState.dragCurrent.y;
+        const dist = Math.hypot(dx, dy);
+        
+        if (dist > 5) {
+            const limitedDist = Math.min(dist, MAX_DRAG);
+            const angle = Math.atan2(dy, dx);
+            currentStone.vx = Math.cos(angle) * limitedDist * SPEED_MULTIPLIER;
+            currentStone.vy = Math.sin(angle) * limitedDist * SPEED_MULTIPLIER;
+            gameState.stonesLaunched++;
+            gameState.totalShots++;
+            stonesLeftDisplay.innerText = `Stones Left: ${MAX_STONES_PER_LEVEL - gameState.stonesLaunched}`;
+
+            if (gameState.stonesLaunched < MAX_STONES_PER_LEVEL) {
+                setTimeout(createNewStone, 500);
+            } else {
+                gameState.waitingForStop = true;
+            }
+        }
+        gameState.isDragging = false;
+    }
+});
+
+canvas.addEventListener('touchstart', (e) => { e.preventDefault(); canvas.dispatchEvent(new MouseEvent('mousedown', {clientX: e.touches[0].clientX, clientY: e.touches[0].clientY})); }, {passive: false});
+canvas.addEventListener('touchmove', (e) => { e.preventDefault(); window.dispatchEvent(new MouseEvent('mousemove', {clientX: e.touches[0].clientX, clientY: e.touches[0].clientY})); }, {passive: false});
+canvas.addEventListener('touchend', () => window.dispatchEvent(new Event('mouseup')));
+
+nextBtn.onclick = () => { if(!gameState.isRandomMode) gameState.level++; setupLevel(gameState.level, false); };
+gotoRandomBtn.onclick = () => { gameState.isRandomMode = true; setupLevel(1, false); };
+
+hintBtn.onclick = () => { 
+    setupLevel(gameState.level, true); 
+    gameState.showHint = true; 
+};
+
+retryBtn.onclick = () => setupLevel(gameState.level, true);
+menuBtn.onclick = backToMenuBtn.onclick = () => { gameState.inGame = false; topMenu.classList.remove('hidden-screen'); gameContainer.classList.add('hidden-screen'); updateLevelSelector(); };
+startGameBtn.onclick = () => { gameState.isRandomMode = false; gameState.level = 1; setupLevel(1, false); startGame(); };
+randomModeBtn.onclick = () => { gameState.isRandomMode = true; gameState.level = 1; setupLevel(1, false); startGame(); };
+
+window.onload = () => { initCanvas(); updateLevelSelector(); requestAnimationFrame(update); };
+window.onresize = initCanvas;
+</script>
+</body>
+</html>

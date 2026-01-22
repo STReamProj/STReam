@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Loader Experiment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .loader-shimmer {
+            background: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-6 font-sans">
+
+    <div class="max-w-2xl mx-auto space-y-8 mt-10">
+        <!-- Project Header -->
+        <header class="text-center">
+            <h1 class="text-3xl font-black text-cyan-400" 
+                data-source="json" data-file="./files/data.json" data-key="project.name">---</h1>
+            <p class="text-slate-500 text-sm mt-1">
+                Version: <span data-source="json" data-file="./files/data.json" data-key="project.version">0.0.0</span>
+            </p>
+        </header>
+
+        <!-- Main Card -->
+        <div class="bg-slate-800 border border-slate-700 rounded-3xl p-8 shadow-2xl overflow-hidden relative">
+            <div class="flex items-center gap-4 mb-6">
+                <!-- Image Attribute Injection -->
+                <img src="" alt="Avatar" class="w-16 h-16 rounded-full bg-slate-700"
+                     data-source="json" data-file="./files/data.json" data-key="author.avatar" data-attr="src">
+                <div>
+                    <h2 class="text-xl font-bold" 
+                        data-source="json" data-file="./files/data.json" data-key="author.name">Loading...</h2>
+                    <p class="text-slate-400 text-sm italic"
+                       data-source="json" data-file="./files/data.json" data-key="author.bio">Wait a second...</p>
+                </div>
+            </div>
+
+            <div class="space-y-4 border-t border-slate-700 pt-6">
+                <h3 class="text-2xl font-bold text-white"
+                    data-source="json" data-file="./files/data.json" data-key="content.title">Loading Title</h3>
+                <p class="text-slate-300 leading-relaxed"
+                   data-source="json" data-file="./files/data.json" data-key="content.description">Loading description text from the external JSON file...</p>
+                
+                <div class="pt-4">
+                    <a href="#" class="inline-block bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-3 px-6 rounded-xl transition-all"
+                       data-source="json" data-file="./files/data.json" data-key="content.docsLink" data-attr="href">
+                        <span data-source="json" data-file="./files/data.json" data-key="content.buttonText">Button</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Status Badge -->
+            <div class="absolute top-4 right-4 px-3 py-1 bg-green-500/20 text-green-400 text-xs font-bold rounded-full border border-green-500/30"
+                 data-source="json" data-file="./files/data.json" data-key="project.status">
+                Checking...
+            </div>
+        </div>
+
+        <!-- Error Handling Simulation -->
+        <div class="p-4 bg-orange-950/20 border border-orange-500/20 rounded-xl">
+            <p class="text-xs text-orange-400 uppercase tracking-widest font-bold mb-2">Error Mode: Log</p>
+            <p class="text-sm text-slate-400"
+               data-source="json" data-file="./files/missing.json" data-key="non-existent" data-error="log">
+                This will be replaced by an error message because the file doesn't exist.
+            </p>
+        </div>
+    </div>
+
+    <!-- 外部のPlaceholder.jsを読み込む -->
+    <script src="Placeholder.js"></script>
+</body>
+</html>
